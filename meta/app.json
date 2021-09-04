@@ -1,0 +1,46 @@
+{
+  "dataSources": [
+    "CRM"
+  ],
+  "generator": "@radzen/blazor-server",
+  "https": false,
+  "layouts": [
+    "Login",
+    "Main"
+  ],
+  "logo": "",
+  "name": "RadzenCRM",
+  "navigation": [
+    "Contacts",
+    "Opportunities",
+    "Opportunity Statuses",
+    "Tasks",
+    "Task Statuses",
+    "Task Types"
+  ],
+  "pages": [
+    "Contacts",
+    "Add Contact",
+    "Edit Contact",
+    "Opportunities",
+    "Add Opportunity",
+    "Edit Opportunity",
+    "Opportunity Statuses",
+    "Add Opportunity Status",
+    "Edit Opportunity Status",
+    "Tasks",
+    "Add Task",
+    "Edit Task",
+    "Task Statuses",
+    "Add Task Status",
+    "Edit Task Status",
+    "Task Types",
+    "Add Task Type",
+    "Edit Task Type"
+  ],
+  "serverLang": "cs",
+  "serverProject": true,
+  "serverVersion": "5",
+  "startPage": "Contacts",
+  "theme": "dark"
+}

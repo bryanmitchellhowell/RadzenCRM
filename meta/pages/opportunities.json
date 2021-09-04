@@ -1,0 +1,201 @@
+{
+  "components": [
+    {
+      "type": "content",
+      "container": "main",
+      "components": [
+        {
+          "type": "heading",
+          "name": "pageTitle",
+          "size": "H1",
+          "text": "Opportunities"
+        },
+        {
+          "type": "row",
+          "components": [
+            {
+              "type": "col",
+              "class": "col-md-12",
+              "components": [
+                {
+                  "icon": "add_circle_outline",
+                  "name": "button0",
+                  "style": {
+                    "marginBottom": "10px"
+                  },
+                  "text": "Add",
+                  "type": "button",
+                  "events": {
+                    "click": [
+                      {
+                        "path": "add-opportunity",
+                        "type": "popup",
+                        "then": [
+                          {
+                            "code": "await grid0.Reload();",
+                            "type": "execute"
+                          },
+                          {
+                            "code": "await InvokeAsync(() => { StateHasChanged(); });",
+                            "type": "execute"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "grid0",
+                  "allowFiltering": true,
+                  "filterMode": "advanced",
+                  "allowPaging": true,
+                  "allowSorting": true,
+                  "data": "${getOpportunitiesResult}",
+                  "events": {
+                    "loadData": [],
+                    "rowSelect": [
+                      {
+                        "parameters": [
+                          {
+                            "name": "Id",
+                            "value": "${event.Id}"
+                          }
+                        ],
+                        "path": "edit-opportunity",
+                        "type": "popup",
+                        "then": [
+                          {
+                            "code": "await InvokeAsync(() => { StateHasChanged(); });",
+                            "type": "execute"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "title": "",
+                  "columns": [
+                    {
+                      "property": "Id",
+                      "title": "Id"
+                    },
+                    {
+                      "property": "Amount",
+                      "title": "Amount"
+                    },
+                    {
+                      "property": "Name",
+                      "title": "Name"
+                    },
+                    {
+                      "property": "UserId",
+                      "title": "User Id"
+                    },
+                    {
+                      "property": "ContactId",
+                      "sortProperty": "Contact.Email",
+                      "groupProperty": "Contact.Email",
+                      "filterProperty": "Contact.Email",
+                      "template": "${data.Contact?.Email}",
+                      "title": "Contact"
+                    },
+                    {
+                      "property": "StatusId",
+                      "sortProperty": "OpportunityStatus.Name",
+                      "groupProperty": "OpportunityStatus.Name",
+                      "filterProperty": "OpportunityStatus.Name",
+                      "template": "${data.OpportunityStatus?.Name}",
+                      "title": "Opportunity Status"
+                    },
+                    {
+                      "property": "CloseDate",
+                      "formatString": "{0:MM/dd/yyyy}",
+                      "title": "Close Date"
+                    },
+                    {
+                      "filterable": false,
+                      "sortable": false,
+                      "width": "70px",
+                      "textAlign": "center",
+                      "template": [
+                        {
+                          "attributes": [
+                            {
+                              "name": "@onclick:stopPropagation",
+                              "value": true
+                            }
+                          ],
+                          "buttonStyle": "danger",
+                          "icon": "close",
+                          "name": "gridDeleteButton",
+                          "text": "",
+                          "size": "sm",
+                          "type": "button",
+                          "events": {
+                            "click": [
+                              {
+                                "condition": "await DialogService.Confirm(\"Are you sure you want to delete this record?\") == true",
+                                "error": [
+                                  {
+                                    "detail": "Unable to delete Opportunity",
+                                    "severity": "error",
+                                    "summary": "Error",
+                                    "type": "notify"
+                                  }
+                                ],
+                                "name": "CRM.deleteOpportunity",
+                                "parameters": [
+                                  {
+                                    "name": "Id",
+                                    "value": "${data.Id}"
+                                  }
+                                ],
+                                "then": [
+                                  {
+                                    "code": "await grid0.Reload();",
+                                    "condition": "result != null",
+                                    "type": "execute"
+                                  }
+                                ],
+                                "type": "invoke"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "type": "datagrid",
+                  "itemType": "RadzenCrm.Models.Crm.Opportunity"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "load": [
+      {
+        "name": "CRM.getOpportunities",
+        "parameters": [
+          {
+            "name": "$expand",
+            "value": "Contact,OpportunityStatus"
+          }
+        ],
+        "then": [
+          {
+            "name": "getOpportunitiesResult",
+            "type": "set",
+            "value": "${result}",
+            "valueType": "IEnumerable<RadzenCrm.Models.Crm.Opportunity>"
+          }
+        ],
+        "type": "invoke"
+      }
+    ]
+  },
+  "name": "Opportunities",
+  "layout": "Main"
+}

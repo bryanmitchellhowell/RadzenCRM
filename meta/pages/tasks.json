@@ -1,0 +1,201 @@
+{
+  "components": [
+    {
+      "type": "content",
+      "container": "main",
+      "components": [
+        {
+          "type": "heading",
+          "name": "pageTitle",
+          "size": "H1",
+          "text": "Tasks"
+        },
+        {
+          "type": "row",
+          "components": [
+            {
+              "type": "col",
+              "class": "col-md-12",
+              "components": [
+                {
+                  "icon": "add_circle_outline",
+                  "name": "button0",
+                  "style": {
+                    "marginBottom": "10px"
+                  },
+                  "text": "Add",
+                  "type": "button",
+                  "events": {
+                    "click": [
+                      {
+                        "path": "add-task",
+                        "type": "popup",
+                        "then": [
+                          {
+                            "code": "await grid0.Reload();",
+                            "type": "execute"
+                          },
+                          {
+                            "code": "await InvokeAsync(() => { StateHasChanged(); });",
+                            "type": "execute"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "grid0",
+                  "allowFiltering": true,
+                  "filterMode": "advanced",
+                  "allowPaging": true,
+                  "allowSorting": true,
+                  "data": "${getTasksResult}",
+                  "events": {
+                    "loadData": [],
+                    "rowSelect": [
+                      {
+                        "parameters": [
+                          {
+                            "name": "Id",
+                            "value": "${event.Id}"
+                          }
+                        ],
+                        "path": "edit-task",
+                        "type": "popup",
+                        "then": [
+                          {
+                            "code": "await InvokeAsync(() => { StateHasChanged(); });",
+                            "type": "execute"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "title": "",
+                  "columns": [
+                    {
+                      "property": "Id",
+                      "title": "Id"
+                    },
+                    {
+                      "property": "Title",
+                      "title": "Title"
+                    },
+                    {
+                      "property": "OpportunityId",
+                      "sortProperty": "Opportunity.Name",
+                      "groupProperty": "Opportunity.Name",
+                      "filterProperty": "Opportunity.Name",
+                      "template": "${data.Opportunity?.Name}",
+                      "title": "Opportunity"
+                    },
+                    {
+                      "property": "DueDate",
+                      "formatString": "{0:MM/dd/yyyy}",
+                      "title": "Due Date"
+                    },
+                    {
+                      "property": "TypeId",
+                      "sortProperty": "TaskType.Name",
+                      "groupProperty": "TaskType.Name",
+                      "filterProperty": "TaskType.Name",
+                      "template": "${data.TaskType?.Name}",
+                      "title": "Task Type"
+                    },
+                    {
+                      "property": "StatusId",
+                      "sortProperty": "TaskStatus.Name",
+                      "groupProperty": "TaskStatus.Name",
+                      "filterProperty": "TaskStatus.Name",
+                      "template": "${data.TaskStatus?.Name}",
+                      "title": "Task Status"
+                    },
+                    {
+                      "filterable": false,
+                      "sortable": false,
+                      "width": "70px",
+                      "textAlign": "center",
+                      "template": [
+                        {
+                          "attributes": [
+                            {
+                              "name": "@onclick:stopPropagation",
+                              "value": true
+                            }
+                          ],
+                          "buttonStyle": "danger",
+                          "icon": "close",
+                          "name": "gridDeleteButton",
+                          "text": "",
+                          "size": "sm",
+                          "type": "button",
+                          "events": {
+                            "click": [
+                              {
+                                "condition": "await DialogService.Confirm(\"Are you sure you want to delete this record?\") == true",
+                                "error": [
+                                  {
+                                    "detail": "Unable to delete Task",
+                                    "severity": "error",
+                                    "summary": "Error",
+                                    "type": "notify"
+                                  }
+                                ],
+                                "name": "CRM.deleteTask",
+                                "parameters": [
+                                  {
+                                    "name": "Id",
+                                    "value": "${data.Id}"
+                                  }
+                                ],
+                                "then": [
+                                  {
+                                    "code": "await grid0.Reload();",
+                                    "condition": "result != null",
+                                    "type": "execute"
+                                  }
+                                ],
+                                "type": "invoke"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "type": "datagrid",
+                  "itemType": "RadzenCrm.Models.Crm.Task"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "load": [
+      {
+        "name": "CRM.getTasks",
+        "parameters": [
+          {
+            "name": "$expand",
+            "value": "Opportunity,TaskType,TaskStatus"
+          }
+        ],
+        "then": [
+          {
+            "name": "getTasksResult",
+            "type": "set",
+            "value": "${result}",
+            "valueType": "IEnumerable<RadzenCrm.Models.Crm.Task>"
+          }
+        ],
+        "type": "invoke"
+      }
+    ]
+  },
+  "name": "Tasks",
+  "layout": "Main"
+}
